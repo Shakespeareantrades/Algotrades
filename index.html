@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlgoTrade V2</title>
+<title>AlgoTrade V2.1</title>
 <style>
 :root{--bg:#06101c;--panel:#0c1928;--panel2:#10243a;--line:#1d3349;--text:#f3f7fb;--muted:#8fa4b8;--green:#27d69b;--red:#ff6170;--blue:#659cff}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
@@ -39,8 +39,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <button class="active" data-view="dashboard">📊 Dashboard</button><button data-view="trade">📈 Trade</button><button data-view="plans">🤖 Plans & Bots</button><button data-view="history">📜 History</button><button data-view="wallet">💳 Wallet</button><button data-view="profile">⚙️ Profile</button><button data-view="admin">🛠️ Admin</button>
 </aside><main>
 <section id="dashboard" class="view active"><div class="title"><div><h1>Trader Dashboard</h1><span class="sub">Your account overview</span></div></div>
-<div class="cards"><div class="card"><div class="label">Virtual Balance</div><div class="value" id="balance">$10,000.00</div></div><div class="card"><div class="label">Today's P/L</div><div class="value up" id="pl">+$184.50</div></div><div class="card"><div class="label">Open Positions</div><div class="value" id="positions">0</div></div><div class="card"><div class="label">Total Invested</div><div class="value" id="invested">$0.00</div></div></div>
-<div class="grid"><div class="section"><h3>EUR/USD <span class="sub" id="eurPrice">1.0842</span></h3><div class="chart"><div class="trend"></div></div><div class="actions" style="margin-top:12px"><button class="btn green" onclick="placeTrade('BUY')">BUY</button><button class="btn red" onclick="placeTrade('SELL')">SELL</button></div></div>
+<div class="cards"><div class="card"><div class="label">Balance</div><div class="value" id="balance">$10,000.00</div></div><div class="card"><div class="label">Today's P/L</div><div class="value up" id="pl">+$184.50</div></div><div class="card"><div class="label">Open Positions</div><div class="value" id="positions">0</div></div><div class="card"><div class="label">Total Invested</div><div class="value" id="invested">$0.00</div></div></div>
+<div class="grid"><div class="section"><h3>EUR/USD <span class="sub" id="eurPrice">—</span> <span class="badge" id="marketStatus">CONNECTING</span></h3><div class="chart"><div class="trend"></div></div><div class="actions" style="margin-top:12px"><button class="btn green" onclick="placeTrade('BUY')">BUY</button><button class="btn red" onclick="placeTrade('SELL')">SELL</button></div></div>
 <div class="section"><h3>Account Summary</h3><div class="row"><span>Equity</span><b id="equity">$10,184.50</b></div><div class="row"><span>Free Margin</span><b id="free">$10,000.00</b></div><div class="row"><span>Win Rate</span><b class="up">72%</b></div><div class="row"><span>Account</span><b class="up">Active</b></div></div></div></section>
 
 <section id="trade" class="view"><div class="title"><h1>Trading Terminal</h1><span class="badge">MARKET DEMO</span></div><div class="grid"><div class="section"><h3 id="chartPair">EUR/USD · 15m</h3><div class="chart"><div class="trend"></div></div><div class="row"><span>Current price</span><b id="terminalPrice">1.0842</b></div></div><div class="section"><h3>Order Ticket</h3>
@@ -69,7 +69,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;p
 <script>
 const KEY='algotrade_v2_state';
 let signupMode=true;
-let state=JSON.parse(localStorage.getItem(KEY)||'null')||{user:null,balance:10000,invested:0,trades:[],plan:null,audit:[],prices:{'EUR/USD':1.0842,'GBP/USD':1.2890,'USD/JPY':147.20,'XAU/USD':2340.00}};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{user:null,balance:10000,invested:0,trades:[],plan:null,audit:[],prices:{'EUR/USD':null,'GBP/USD':null,'USD/JPY':null,'XAU/USD':null},live:false};
 const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
 const money=n=>'$'+Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const q=id=>document.getElementById(id);
@@ -79,7 +79,7 @@ function render(){
 q('balance').textContent=money(state.balance);q('walletBal').textContent=money(state.balance);q('invested').textContent=money(state.invested);
 q('positions').textContent=state.trades.filter(t=>t.status==='Open').length;q('adminTrades').textContent=state.trades.length;q('adminBalance').textContent=money(state.balance);
 q('equity').textContent=money(state.balance+184.5);q('free').textContent=money(state.balance);
-q('eurPrice').textContent=Number(state.prices['EUR/USD']).toFixed(4);
+q('eurPrice').textContent=state.prices['EUR/USD']?Number(state.prices['EUR/USD']).toFixed(5):'—';
 q('historyBody').innerHTML=state.trades.length?state.trades.map(t=>`<tr><td>${t.time}</td><td>${t.pair}</td><td class="${t.side==='BUY'?'up':'down'}">${t.side}</td><td>${money(t.amount)}</td><td>${t.entry}</td><td>${t.sl}</td><td>${t.tp}</td><td>${t.status}</td></tr>`).join(''):'<tr><td colspan="8" class="sub">No trades yet.</td></tr>';
 q('audit').innerHTML=state.audit.length?state.audit.slice().reverse().map(a=>`<div class="row"><span>${a.time}</span><b>${a.text}</b></div>`).join(''):'No changes yet.';
 }
@@ -97,20 +97,54 @@ if(type==='add')state.balance+=n;if(type==='remove')state.balance=Math.max(0,sta
 state.audit.push({time:new Date().toLocaleString(),text:`Admin ${type==='add'?'added':type==='remove'?'removed':'set'} ${money(n)} virtual balance`});save();render();notify('Admin balance updated');
 }
 function setSimPrice(dir){
-const pair=q('simPair').value;let p=Number(q('simPrice').value);if(!p){notify('Enter a price');return}
+const pair=q('simPair').value;let p=Number(q('simPrice').value);if(!p){p=Number(state.prices[pair]||0)};if(!p){notify('Enter a starting price');return}
 p=dir==='up'?p*1.005:p*.995;state.prices[pair]=Number(p.toFixed(4));q('simPrice').value=state.prices[pair];
 if(pair==='EUR/USD')q('eurPrice').textContent=state.prices[pair].toFixed(4);
 state.audit.push({time:new Date().toLocaleString(),text:`Controlled simulator moved ${pair} ${dir.toUpperCase()} to ${state.prices[pair]}`});
 save();render();notify(pair+' simulated price moved '+dir.toUpperCase());
 }
 function pauseMarket(){state.audit.push({time:new Date().toLocaleString(),text:'Controlled market simulator paused'});save();render();notify('Controlled market paused')}
-function updatePrice(){const p=q('pair').value;q('chartPair').textContent=p+' · 15m';q('terminalPrice').textContent=Number(state.prices[p]??0).toFixed(4)}
+
+async function fetchLivePrices(){
+  try{
+    const urls=[
+      'https://api.forexapi.eu/v2/live?base=EUR&counter=USD&format=json',
+      'https://api.forexapi.eu/v2/live?base=GBP&counter=USD&format=json',
+      'https://api.forexapi.eu/v2/live?base=USD&counter=JPY&format=json'
+    ];
+    const [eu,gb,uj]=await Promise.all(
+      urls.map(u=>fetch(u,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)))
+    );
+    const eur=eu?.quotes?.USD?.mid;
+    const gbp=gb?.quotes?.USD?.mid;
+    const jpy=uj?.quotes?.JPY?.mid;
+    if(eur) state.prices['EUR/USD']=Number(eur);
+    if(gbp) state.prices['GBP/USD']=Number(gbp);
+    if(jpy) state.prices['USD/JPY']=Number(jpy);
+    state.live=!!(eur||gbp||jpy);
+    q('marketStatus').textContent=state.live?'LIVE DATA':'OFFLINE';
+    q('marketStatus').style.color=state.live?'var(--green)':'var(--red)';
+    q('marketStatus').style.background=state.live?'#103a31':'#3b1720';
+    q('eurPrice').textContent=state.prices['EUR/USD']?Number(state.prices['EUR/USD']).toFixed(5):'—';
+    if(q('pair')) updatePrice();
+    save();
+  }catch(e){
+    state.live=false;
+    q('marketStatus').textContent='OFFLINE';
+    q('marketStatus').style.color='var(--red)';
+    q('marketStatus').style.background='#3b1720';
+  }
+}
+
+function updatePrice(){const p=q('pair').value;q('chartPair').textContent=p+' · 15m';q('terminalPrice').textContent=state.prices[p]?Number(state.prices[p]).toFixed(5):'—'}
 function logout(){state.user=null;save();location.reload()}
 q('authForm').addEventListener('submit',e=>{e.preventDefault();const email=q('email').value.trim(),password=q('password').value;if(password.length<6){notify('Password must be at least 6 characters');return}
 if(signupMode){state.user={name:q('name').value.trim()||'Demo Trader',email,password};save();showApp()}else{if(!state.user||state.user.email!==email||state.user.password!==password){notify('Login details not found');return}showApp()}});
 q('toggleAuth').onclick=()=>{signupMode=!signupMode;q('authTitle').textContent=signupMode?'Create your account':'Welcome back';q('authSub').textContent=signupMode?'V2 account foundation · virtual funds':'Sign in to your account';q('authBtn').textContent=signupMode?'Create account':'Sign in';q('nameWrap').classList.toggle('hidden',!signupMode);q('toggleAuth').textContent=signupMode?'Already have an account? Sign in':'New here? Create an account'};
 document.querySelectorAll('.side button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.side button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));q(b.dataset.view).classList.add('active');render()});
 if(state.user)showApp();
+fetchLivePrices();
+setInterval(fetchLivePrices,30000);
 </script>
 </body>
 </html>
