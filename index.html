@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlgoTrade — Trading Simulator</title>
+<style>
+:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#10243a;--line:#1d3550;--text:#eef6ff;--muted:#8fa6bd;--green:#25d69a;--red:#ff5f6d;--accent:#6ea8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}
+.nav{height:70px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#091624;position:sticky;top:0;z-index:5}
+.logo{font-size:22px;font-weight:800}.logo span{color:var(--green)}.nav small{color:var(--muted)}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 70px)}
+.side{border-right:1px solid var(--line);padding:22px 14px;background:#091624}.side button{display:block;width:100%;text-align:left;background:transparent;color:var(--muted);border:0;padding:13px 14px;border-radius:9px;margin:4px 0}.side button.active,.side button:hover{background:var(--panel2);color:#fff}
+.main{padding:28px;max-width:1500px;width:100%;margin:auto}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.title h1{margin:0;font-size:28px}.badge{background:#123a34;color:var(--green);padding:7px 10px;border-radius:20px;font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:19px}.label{color:var(--muted);font-size:13px}.value{font-size:25px;font-weight:750;margin-top:9px}.up{color:var(--green)}.down{color:var(--red)}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}.section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}.section h3{margin:0 0 15px}
+.chart{height:320px;position:relative;overflow:hidden;background:linear-gradient(180deg,#0d1b2d,#0a1726);border-radius:10px}.chart:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#18304a 1px,transparent 1px),linear-gradient(90deg,#18304a 1px,transparent 1px);background-size:52px 52px;opacity:.45}.line{position:absolute;left:0;right:0;bottom:50px;height:210px;background:linear-gradient(135deg,transparent 0 10%,#25d69a 10.2% 10.8%,transparent 11% 19%,#25d69a 19.2% 19.8%,transparent 20% 28%,#25d69a 28.2% 28.8%,transparent 29% 40%,#25d69a 40.2% 40.8%,transparent 41% 50%,#ff5f6d 50.2% 50.8%,transparent 51% 61%,#25d69a 61.2% 61.8%,transparent 62% 72%,#25d69a 72.2% 72.8%,transparent 73% 82%,#25d69a 82.2% 82.8%,transparent 83% 91%,#25d69a 91.2% 91.8%,transparent 92%);opacity:.85;transform:skewY(-8deg)}
+.row{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px}.row:last-child{border:0}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:500}
+.actions{display:flex;gap:10px;margin-top:15px}.btn{border:0;border-radius:9px;padding:11px 17px;color:#fff;background:var(--accent);font-weight:700}.btn.green{background:#159f76}.btn.red{background:#c93e52}.btn.dark{background:#162a40}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.plan{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:18px}.plan h4{margin:0 0 8px}.plan p{color:var(--muted);font-size:13px;line-height:1.6}
+.view{display:none}.view.active{display:block}.form{max-width:430px;margin:50px auto;background:var(--panel);border:1px solid var(--line);padding:28px;border-radius:16px}.form input{width:100%;padding:12px;margin:7px 0 12px;border:1px solid var(--line);border-radius:8px;background:#091624;color:white}
+.toast{position:fixed;right:22px;bottom:22px;background:#17334d;padding:14px 18px;border-radius:10px;display:none}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line)}.side button{min-width:130px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.plans{grid-template-columns:1fr}.main{padding:18px}}
+@media(max-width:520px){.cards{grid-template-columns:1fr}.nav{padding:0 16px}.main{padding:14px}}
+</style>
+</head>
+<body>
+<div class="nav"><div class="logo">Algo<span>Trade</span></div><small>Paper Trading • V1 Prototype</small></div>
+<div class="layout">
+<aside class="side">
+<button class="active" data-view="dashboard">📊 Dashboard</button><button data-view="trade">📈 Trade</button><button data-view="plans">🤖 Investment Plans</button><button data-view="history">📜 Trade History</button><button data-view="wallet">💳 Wallet</button><button data-view="profile">⚙️ Profile</button><button data-view="admin">🛠️ Admin</button>
+</aside>
+<main class="main">
+<section id="dashboard" class="view active">
+<div class="title"><div><h1>Trader Dashboard</h1><small>Welcome back, Demo Trader</small></div><span class="badge">SIMULATION MODE</span></div>
+<div class="cards">
+<div class="card"><div class="label">Virtual Balance</div><div class="value" id="balance">$10,000.00</div></div>
+<div class="card"><div class="label">Today's P/L</div><div class="value up" id="pl">+$184.50</div></div>
+<div class="card"><div class="label">Open Positions</div><div class="value" id="positions">2</div></div>
+<div class="card"><div class="label">Total Invested</div><div class="value">$4,000.00</div></div>
+</div>
+<div class="grid">
+<div class="section"><h3>EUR/USD</h3><div class="chart"><div class="line"></div></div><div class="actions"><button class="btn green" onclick="trade('BUY')">BUY 1.0842</button><button class="btn red" onclick="trade('SELL')">SELL 1.0840</button></div></div>
+<div class="section"><h3>Account Summary</h3><div class="row"><span>Equity</span><b>$10,184.50</b></div><div class="row"><span>Margin Used</span><b>$1,200.00</b></div><div class="row"><span>Free Margin</span><b>$8,984.50</b></div><div class="row"><span>Win Rate</span><b class="up">72%</b></div></div>
+</div>
+</section>
+<section id="trade" class="view"><div class="title"><h1>Trading Terminal</h1><span class="badge">LIVE SIMULATION</span></div><div class="grid"><div class="section"><h3>GBP/USD · 15m</h3><div class="chart"><div class="line"></div></div></div><div class="section"><h3>Order Ticket</h3><label>Amount</label><input id="amount" type="number" value="1000" style="width:100%;padding:12px;margin:8px 0;background:#091624;border:1px solid var(--line);color:white;border-radius:8px"><label>Stop Loss</label><input type="number" value="1.0750" style="width:100%;padding:12px;margin:8px 0;background:#091624;border:1px solid var(--line);color:white;border-radius:8px"><label>Take Profit</label><input type="number" value="1.0950" style="width:100%;padding:12px;margin:8px 0;background:#091624;border:1px solid var(--line);color:white;border-radius:8px"><div class="actions"><button class="btn green" onclick="trade('BUY')">Buy</button><button class="btn red" onclick="trade('SELL')">Sell</button></div></div></div></section>
+<section id="plans" class="view"><div class="title"><h1>Investment Plans</h1></div><div class="plans"><div class="plan"><h4>Standard Plan</h4><p>Flexible simulated investment package. Track virtual returns and duration from your dashboard.</p><button class="btn" onclick="notify('Standard plan selected')">Select Plan</button></div><div class="plan"><h4>AI Trading Bot</h4><p>Automated virtual trading strategy with performance tracking and risk controls.</p><button class="btn" onclick="notify('AI Bot plan selected')">Select Plan</button></div><div class="plan"><h4>Copy Trading</h4><p>Simulate copying experienced trader activity with performance monitoring.</p><button class="btn" onclick="notify('Copy Trading selected')">Select Plan</button></div></div></section>
+<section id="history" class="view"><div class="title"><h1>Trade History</h1></div><div class="section"><table><thead><tr><th>Pair</th><th>Side</th><th>Amount</th><th>Price</th><th>P/L</th><th>Status</th></tr></thead><tbody id="historyBody"><tr><td>EUR/USD</td><td class="up">BUY</td><td>$1,000</td><td>1.0842</td><td class="up">+$84.50</td><td>Open</td></tr><tr><td>GBP/USD</td><td class="down">SELL</td><td>$500</td><td>1.2890</td><td class="up">+$100.00</td><td>Closed</td></tr></tbody></table></div></section>
+<section id="wallet" class="view"><div class="title"><h1>Wallet</h1></div><div class="cards"><div class="card"><div class="label">Available Virtual Funds</div><div class="value">$10,000.00</div></div><div class="card"><div class="label">Pending Deposits</div><div class="value">$0.00</div></div><div class="card"><div class="label">Pending Withdrawals</div><div class="value">$0.00</div></div></div><div class="section" style="margin-top:18px"><h3>Simulation Actions</h3><div class="actions"><button class="btn green" onclick="notify('Simulated deposit request created')">Deposit Virtual Funds</button><button class="btn dark" onclick="notify('Simulated withdrawal request created')">Request Withdrawal</button></div></div></section>
+<section id="profile" class="view"><div class="title"><h1>Profile & Security</h1></div><div class="section"><div class="row"><span>Name</span><b>Demo Trader</b></div><div class="row"><span>Email</span><b>demo@example.com</b></div><div class="row"><span>Account Status</span><b class="up">Verified (Demo)</b></div><div class="row"><span>Login Protection</span><b>Enabled</b></div></div></section>
+<section id="admin" class="view"><div class="title"><div><h1>Admin Control Panel</h1><small>Demo administration</small></div><span class="badge">ADMIN</span></div><div class="cards"><div class="card"><div class="label">Registered Users</div><div class="value">128</div></div><div class="card"><div class="label">Active Investments</div><div class="value">74</div></div><div class="card"><div class="label">Pending Deposits</div><div class="value">6</div></div><div class="card"><div class="label">Pending Withdrawals</div><div class="value">3</div></div></div><div class="section" style="margin-top:18px"><h3>Management</h3><div class="row"><span>User management</span><button class="btn dark" onclick="notify('User manager opened')">Open</button></div><div class="row"><span>Investment plans</span><button class="btn dark" onclick="notify('Plan manager opened')">Manage</button></div><div class="row"><span>Deposits & withdrawals</span><button class="btn dark" onclick="notify('Transaction manager opened')">Review</button></div><div class="row"><span>Virtual balances</span><button class="btn dark" onclick="notify('Balance controls opened')">Adjust</button></div></div></section>
+</main></div><div class="toast" id="toast"></div>
+<script>
+let balance=10000, positions=2;
+document.querySelectorAll('.side button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.side button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(b.dataset.view).classList.add('active')});
+function notify(t){let x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2200)}
+function trade(side){let amount=Number(document.getElementById('amount')?.value||1000);if(amount<=0||amount>balance){notify('Invalid virtual order amount');return}positions++;balance-=amount*.01;document.getElementById('balance').textContent='$'+balance.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});document.getElementById('positions').textContent=positions;document.getElementById('historyBody').insertAdjacentHTML('afterbegin',`<tr><td>EUR/USD</td><td class="${side==='BUY'?'up':'down'}">${side}</td><td>$${amount.toLocaleString()}</td><td>1.0842</td><td>—</td><td>Open</td></tr>`);notify(side+' order placed in simulation mode')}
+</script></body></html>
