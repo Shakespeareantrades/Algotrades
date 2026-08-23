@@ -1,96 +1,128 @@
-const COINS = {
-  "BTC/USDT": "bitcoin",
-  "ETH/USDT": "ethereum",
-  "SOL/USDT": "solana",
-  "BNB/USDT": "binancecoin",
-  "XRP/USDT": "ripple"
-};
+const STREAMS =
+  "btcusdt@ticker/ethusdt@ticker/solusdt@ticker/bnbusdt@ticker/xrpusdt@ticker";
 
-const IDS = Object.values(COINS).join(",");
+const BINANCE_WS_HTTP =
+  `https://stream.binance.com:443/stream?streams=${STREAMS}`;
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     if (url.pathname === "/api/health") {
       return json({
         ok: true,
-        service: "AlgoTrade market API",
-        provider: "CoinGecko",
+        service: "AlgoTrade live market gateway",
+        provider: "Binance WebSocket",
         time: new Date().toISOString()
       });
     }
 
+    if (url.pathname === "/market") {
+      return proxyMarketWebSocket(request);
+    }
+
     if (url.pathname === "/api/prices") {
-      try {
-        const upstream = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${IDS}&vs_currencies=usd`,
-          {
-            method: "GET",
-            headers: {
-              "Accept": "application/json",
-              "User-Agent": "AlgoTrade/3.0"
-            },
-            cf: {
-              cacheTtl: 0,
-              cacheEverything: false
-            }
-          }
-        );
-
-        if (!upstream.ok) {
-          return json({
-            ok: false,
-            error: `Market provider returned HTTP ${upstream.status}`
-          }, 502);
-        }
-
-        const raw = await upstream.json();
-        const prices = {};
-
-        for (const [pair, coinId] of Object.entries(COINS)) {
-          const value = raw?.[coinId]?.usd;
-
-          if (typeof value === "number" && Number.isFinite(value)) {
-            prices[pair] = value;
-          }
-        }
-
-        if (!Object.keys(prices).length) {
-          return json({
-            ok: false,
-            error: "Market provider returned no usable prices."
-          }, 502);
-        }
-
-        return json({
-          ok: true,
-          source: "CoinGecko public market data",
-          timestamp: new Date().toISOString(),
-          prices
-        }, 200, {
-          "Cache-Control": "no-store, max-age=0"
-        });
-
-      } catch (error) {
-        return json({
-          ok: false,
-          error: "Unable to reach the market data provider."
-        }, 502);
-      }
+      return json({
+        ok: false,
+        error: "Live prices are delivered through the /market WebSocket.",
+        endpoint: "/market"
+      }, 426);
     }
 
     return env.ASSETS.fetch(request);
   }
 };
 
-function json(data, status = 200, extraHeaders = {}) {
+async function proxyMarketWebSocket(request) {
+  if (request.headers.get("Upgrade") !== "websocket") {
+    return new Response("Expected WebSocket upgrade.", { status: 426 });
+  }
+
+  const pair = new WebSocketPair();
+  const [client, server] = Object.values(pair);
+
+  server.accept({ allowHalfOpen: true });
+
+  let upstream;
+
+  try {
+    const response = await fetch(BINANCE_WS_HTTP, {
+      headers: {
+        "Upgrade": "websocket"
+      }
+    });
+
+    if (response.status !== 101 || !response.webSocket) {
+      server.send(JSON.stringify({
+        type: "error",
+        message: `Upstream WebSocket handshake failed (HTTP ${response.status}).`
+      }));
+      server.close(1011, "Market provider unavailable");
+      return new Response(null, { status: 101, webSocket: client });
+    }
+
+    upstream = response.webSocket;
+    upstream.accept({ allowHalfOpen: true });
+    upstream.binaryType = "arraybuffer";
+
+    upstream.addEventListener("message", event => {
+      if (server.readyState === WebSocket.OPEN) {
+        server.send(event.data);
+      }
+    });
+
+    upstream.addEventListener("error", () => {
+      if (server.readyState === WebSocket.OPEN) {
+        server.send(JSON.stringify({
+          type: "error",
+          message: "Upstream market stream error."
+        }));
+      }
+    });
+
+    upstream.addEventListener("close", event => {
+      if (server.readyState !== WebSocket.CLOSED) {
+        server.close(event.code || 1000, "Market stream closed");
+      }
+    });
+
+    server.addEventListener("message", event => {
+      // The browser normally does not need to send anything.
+      // Forwarding messages keeps the proxy generic.
+      if (upstream && upstream.readyState === WebSocket.OPEN) {
+        upstream.send(event.data);
+      }
+    });
+
+    server.addEventListener("close", event => {
+      if (upstream && upstream.readyState !== WebSocket.CLOSED) {
+        upstream.close(event.code || 1000, "Client disconnected");
+      }
+    });
+
+  } catch (error) {
+    if (server.readyState === WebSocket.OPEN) {
+      server.send(JSON.stringify({
+        type: "error",
+        message: "Unable to connect to the live market stream."
+      }));
+      server.close(1011, "Market connection failed");
+    }
+  }
+
+  return new Response(null, {
+    status: 101,
+    webSocket: client
+  });
+}
+
+function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "Content-Type": "application/json; charset=UTF-8",
       "Access-Control-Allow-Origin": "*",
-      ...extraHeaders
+      "Cache-Control": "no-store"
     }
   });
 }
