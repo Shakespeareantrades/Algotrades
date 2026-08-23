@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AlgoTrade Crypto V3</title>
+<title>DevolksCapital Crypto</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#06101c;color:#f4f7fb;font:14px Arial,sans-serif}
@@ -205,7 +205,7 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
 <div id="toast" class="toast"></div>
 
 <script>
-const K='algotrade_crypto_v3';
+const K='devolkscapital_crypto_v3';
 const DEFAULT_PRICES={'BTC/USDT':null,'ETH/USDT':null,'SOL/USDT':null,'BNB/USDT':null,'XRP/USDT':null};
 let s=JSON.parse(localStorage.getItem(K)||'null')||{
   user:null,balance:10000,trades:[],prices:{...DEFAULT_PRICES},history:{'BTC/USDT':[],'ETH/USDT':[],'SOL/USDT':[],'BNB/USDT':[],'XRP/USDT':[]},live:false,audit:[],overrides:{}
@@ -261,24 +261,71 @@ function renderTradePrice(){
   updateChart(s.history[pair]||[], 'tradeLine','tradeDot');
 }
 
-async function fetchPrices(){
-  try{
-    const r=await fetch('/api/prices',{cache:'no-store'});
-    if(!r.ok)throw new Error('API '+r.status);
-    const data=await r.json();
-    if(!data.ok)throw new Error(data.error||'Market API error');
-    for(const [pair,p] of Object.entries(data.prices||{})){
-      if(Number.isFinite(p)){
-        s.prices[p]=p;
-        if(!s.history[p])s.history[p]=[];
-        s.history[p].push(p);
-        if(s.history[p].length>60)s.history[p].shift();
+let marketSocket = null;
+let marketReconnectTimer = null;
+
+function connectMarket(){
+  if (marketSocket && (marketSocket.readyState === WebSocket.OPEN ||
+                       marketSocket.readyState === WebSocket.CONNECTING)) return;
+
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  marketSocket = new WebSocket(protocol + '//' + location.host + '/market');
+
+  marketSocket.onopen = () => {
+    s.live = true;
+    render();
+  };
+
+  marketSocket.onmessage = event => {
+    try{
+      const msg = JSON.parse(event.data);
+
+      if(msg.type === 'error'){
+        s.live = false;
+        render();
+        return;
       }
+
+      const payload = msg.data || msg;
+      const symbol = payload.s;
+      const closePrice = Number(payload.c);
+
+      const map = {
+        BTCUSDT:'BTC/USDT',
+        ETHUSDT:'ETH/USDT',
+        SOLUSDT:'SOL/USDT',
+        BNBUSDT:'BNB/USDT',
+        XRPUSDT:'XRP/USDT'
+      };
+
+      const pair = map[symbol];
+
+      if(pair && Number.isFinite(closePrice)){
+        s.prices[pair] = closePrice;
+        if(!s.history[pair]) s.history[pair] = [];
+        s.history[pair].push(closePrice);
+        if(s.history[pair].length > 60) s.history[pair].shift();
+        s.live = true;
+        save();
+        render();
+      }
+    }catch(e){
+      s.live = false;
+      render();
     }
-    s.live=true;save();render();
-  }catch(e){
-    s.live=false;render();
-  }
+  };
+
+  marketSocket.onerror = () => {
+    s.live = false;
+    render();
+  };
+
+  marketSocket.onclose = () => {
+    s.live = false;
+    render();
+    clearTimeout(marketReconnectTimer);
+    marketReconnectTimer = setTimeout(connectMarket, 3000);
+  };
 }
 
 function openTrade(side){
@@ -337,8 +384,7 @@ document.querySelectorAll('aside button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));q(b.dataset.v).classList.add('active');render();
 });
 if(s.user)show();else{q('app').style.display='none'}
-fetchPrices();
-setInterval(fetchPrices,5000);
+connectMarket();
 </script>
 </body>
 </html>
