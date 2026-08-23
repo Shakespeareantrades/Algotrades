@@ -1,32 +1,42 @@
-const MARKET_URL =
-  "https://api.binance.com/api/v3/ticker/price?symbols=" +
-  encodeURIComponent(JSON.stringify([
-    "BTCUSDT",
-    "ETHUSDT",
-    "SOLUSDT",
-    "BNBUSDT",
-    "XRPUSDT"
-  ]));
-
-const SYMBOLS = {
-  BTCUSDT: "BTC/USDT",
-  ETHUSDT: "ETH/USDT",
-  SOLUSDT: "SOL/USDT",
-  BNBUSDT: "BNB/USDT",
-  XRPUSDT: "XRP/USDT"
+const COINS = {
+  "BTC/USDT": "bitcoin",
+  "ETH/USDT": "ethereum",
+  "SOL/USDT": "solana",
+  "BNB/USDT": "binancecoin",
+  "XRP/USDT": "ripple"
 };
+
+const IDS = Object.values(COINS).join(",");
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Real-market price API used by the AlgoTrade frontend.
+    if (url.pathname === "/api/health") {
+      return json({
+        ok: true,
+        service: "AlgoTrade market API",
+        provider: "CoinGecko",
+        time: new Date().toISOString()
+      });
+    }
+
     if (url.pathname === "/api/prices") {
       try {
-        const upstream = await fetch(MARKET_URL, {
-          headers: { "Accept": "application/json" },
-          cf: { cacheTtl: 0, cacheEverything: false }
-        });
+        const upstream = await fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${IDS}&vs_currencies=usd`,
+          {
+            method: "GET",
+            headers: {
+              "Accept": "application/json",
+              "User-Agent": "AlgoTrade/3.0"
+            },
+            cf: {
+              cacheTtl: 0,
+              cacheEverything: false
+            }
+          }
+        );
 
         if (!upstream.ok) {
           return json({
@@ -38,20 +48,30 @@ export default {
         const raw = await upstream.json();
         const prices = {};
 
-        for (const item of raw) {
-          if (SYMBOLS[item.symbol]) {
-            prices[SYMBOLS[item.symbol]] = Number(item.price);
+        for (const [pair, coinId] of Object.entries(COINS)) {
+          const value = raw?.[coinId]?.usd;
+
+          if (typeof value === "number" && Number.isFinite(value)) {
+            prices[pair] = value;
           }
+        }
+
+        if (!Object.keys(prices).length) {
+          return json({
+            ok: false,
+            error: "Market provider returned no usable prices."
+          }, 502);
         }
 
         return json({
           ok: true,
-          source: "Binance public market data",
+          source: "CoinGecko public market data",
           timestamp: new Date().toISOString(),
           prices
         }, 200, {
           "Cache-Control": "no-store, max-age=0"
         });
+
       } catch (error) {
         return json({
           ok: false,
@@ -60,16 +80,6 @@ export default {
       }
     }
 
-    // Optional simple health check.
-    if (url.pathname === "/api/health") {
-      return json({
-        ok: true,
-        service: "AlgoTrade market API",
-        time: new Date().toISOString()
-      });
-    }
-
-    // Everything else is served from /public by Cloudflare Static Assets.
     return env.ASSETS.fetch(request);
   }
 };
