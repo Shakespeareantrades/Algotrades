@@ -3,385 +3,199 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DevolksCapital Crypto</title>
+<title>DevolksCapital V1</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#06101c;color:#f4f7fb;font:14px Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#06101c;color:#f4f7fb;font:14px Arial,sans-serif}
 .top{height:65px;background:#081522;border-bottom:1px solid #1d3349;display:flex;align-items:center;justify-content:space-between;padding:0 22px;gap:15px}
-.logo{font-size:21px;font-weight:800}.logo b{color:#27d69b}
-.badge{padding:7px 10px;border-radius:20px;background:#103a31;color:#27d69b;font-size:11px;white-space:nowrap}
-.badge.off{background:#3b1720;color:#ff6170}
-.layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 65px)}
-aside{background:#081522;padding:15px 10px;border-right:1px solid #1d3349}
-aside button{width:100%;padding:12px;margin:3px 0;border:0;border-radius:8px;background:0;color:#9ab0c3;text-align:left}
-aside button.active,aside button:hover{background:#10243a;color:#fff}
-main{padding:25px;max-width:1450px;width:100%;margin:auto}
-.view{display:none}.view.active{display:block}
-.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px}
-.title h1{margin:0;font-size:27px}
-.muted{color:#8fa4b8;font-size:12px}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
-.card,.box{background:#0c1928;border:1px solid #1d3349;border-radius:13px;padding:17px}
-.label{color:#8fa4b8;font-size:12px}
-.value{font-size:23px;font-weight:800;margin-top:7px}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:15px;margin-top:15px}
-.chart{height:310px;background:linear-gradient(180deg,#0d1b2b,#091522);border-radius:10px;position:relative;overflow:hidden;background-image:linear-gradient(#183049 1px,transparent 1px),linear-gradient(90deg,#183049 1px,transparent 1px);background-size:48px 48px}
-.spark{position:absolute;inset:0;width:100%;height:100%}
-.line{fill:none;stroke:#27d69b;stroke-width:2.5}
-.dot{fill:#27d69b}
-.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1d3349;gap:10px}
-.btn{border:0;border-radius:8px;padding:10px 15px;color:#fff;font-weight:700;background:#659cff}
-.green{background:#159b73}.red{background:#c53d51}.dark{background:#172b40}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.logo{font-size:21px;font-weight:800}.logo b{color:#27d69b}.badge{padding:7px 10px;border-radius:20px;background:#103a31;color:#27d69b;font-size:11px;white-space:nowrap}.badge.off{background:#3b1720;color:#ff6170}
+.layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 65px)}aside{background:#081522;padding:15px 10px;border-right:1px solid #1d3349}aside button{width:100%;padding:12px;margin:3px 0;border:0;border-radius:8px;background:0;color:#9ab0c3;text-align:left;cursor:pointer}aside button.active,aside button:hover{background:#10243a;color:#fff}
+main{padding:25px;max-width:1500px;width:100%;margin:auto}.view{display:none}.view.active{display:block}.title{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:10px}.title h1{margin:0;font-size:27px}
+.muted,.label{color:#8fa4b8;font-size:12px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card,.box{background:#0c1928;border:1px solid #1d3349;border-radius:13px;padding:17px}.value{font-size:23px;font-weight:800;margin-top:7px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:15px;margin-top:15px}.chart{height:320px;background:#091522;border-radius:10px;position:relative;overflow:hidden;background-image:linear-gradient(#183049 1px,transparent 1px),linear-gradient(90deg,#183049 1px,transparent 1px);background-size:48px 48px}
+canvas{width:100%;height:100%;display:block}.row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #1d3349;gap:10px}.btn{border:0;border-radius:8px;padding:10px 15px;color:#fff;font-weight:700;background:#659cff;cursor:pointer}.green{background:#159b73}.red{background:#c53d51}.dark{background:#172b40}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 input,select{width:100%;padding:11px;background:#071321;color:#fff;border:1px solid #1d3349;border-radius:8px;margin:5px 0 10px}
-.field label{font-size:12px;color:#8fa4b8}
-table{width:100%;border-collapse:collapse;min-width:750px}
-th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
-.table-wrap{overflow:auto}
-.up{color:#27d69b}.down{color:#ff6170}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.plan{background:#10243a;border:1px solid #1d3349;padding:18px;border-radius:12px}
-.auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:#06101c}
-.authbox{width:min(430px,100%);padding:28px;background:#0c1928;border:1px solid #1d3349;border-radius:15px}
-.authbox h1{margin-bottom:5px}.authbox p{color:#8fa4b8}.authbox .btn{width:100%}
-.link{text-align:center;color:#659cff;margin-top:13px;cursor:pointer}
-.toast{display:none;position:fixed;right:15px;bottom:15px;padding:13px;background:#17344e;border:1px solid #1d3349;border-radius:9px;z-index:20}
-.note{color:#8fa4b8;font-size:12px;line-height:1.5;margin-top:10px}
-.market-status{display:flex;align-items:center;gap:8px;margin:10px 0}
-.pulse{width:8px;height:8px;border-radius:50%;background:#ff6170}.pulse.on{background:#27d69b}
-@media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto}aside button{min-width:125px}.cards{grid-template-columns:repeat(2,1fr)}.grid,.plans{grid-template-columns:1fr}}
-@media(max-width:520px){.cards{grid-template-columns:1fr}main{padding:15px}.top{padding:0 12px}}
+table{width:100%;border-collapse:collapse;min-width:900px}th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}.table-wrap{overflow:auto}.up{color:#27d69b}.down{color:#ff6170}.notice{color:#8fa4b8;font-size:12px;line-height:1.5;margin-top:10px;padding:10px;background:#10243a;border-radius:8px}.danger{background:#3b1720;color:#ff9aa5}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}.authbox{width:min(430px,100%);padding:28px;background:#0c1928;border:1px solid #1d3349;border-radius:15px}.authbox p{color:#8fa4b8}.authbox .btn{width:100%}.link{text-align:center;color:#659cff;margin-top:13px;cursor:pointer}.toast{display:none;position:fixed;right:15px;bottom:15px;padding:13px;background:#17344e;border:1px solid #1d3349;border-radius:9px;z-index:20}
+.hidden{display:none!important}.market-status{display:flex;align-items:center;gap:8px;margin:10px 0}.pulse{width:8px;height:8px;border-radius:50%;background:#ff6170}.pulse.on{background:#27d69b}
+@media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto}aside button{min-width:125px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:520px){.cards{grid-template-columns:1fr}main{padding:15px}.top{padding:0 12px}}
 </style>
 </head>
-<body> 
+<body>
+
 <div id="auth" class="auth">
-  <div class="authbox">
-    <div class="logo">Algo<b>Trade</b></div>
-    <h1 id="at">Create your account</h1>
-    <p>Crypto trading simulator with real market prices</p>
-    <form id="af">
-      <div id="nw"><label class="muted">Full name</label><input id="name" placeholder="Demo Trader"></div>
-      <label class="muted">Email</label><input id="email" type="email" required>
-      <label class="muted">Password</label><input id="pw" type="password" required>
-      <button class="btn green" id="ab">Create account</button>
-    </form>
-    <div class="link" id="toggle">Already have an account? Sign in</div>
-  </div>
-</div>
+<div class="authbox">
+<div class="logo">Devolks<b>Capital</b></div><h1 id="authTitle">Create your account</h1>
+<p>Crypto trading simulator with real market prices.</p>
+<form id="authForm">
+<div id="nameWrap"><label class="muted">Full name</label><input id="name" placeholder="Demo Trader"></div>
+<label class="muted">Email</label><input id="email" type="email" required>
+<label class="muted">Password</label><input id="pw" type="password" required>
+<button class="btn green" id="authBtn">Create account</button>
+</form><div class="link" id="authToggle">Already have an account? Sign in</div>
+</div></div>
 
-<div id="app" style="display:none">
-<header class="top">
-  <div class="logo">Algo<b>Trade</b></div>
-  <div>
-    <span id="mode" class="badge">SIMULATION MODE</span>
-    <span id="user" class="muted"></span>
-    <button class="btn dark" onclick="logout()">Log out</button>
-  </div>
-</header>
+<div id="app" class="hidden">
+<header class="top"><div class="logo">Devolks<b>Capital</b></div><div>
+<span id="mode" class="badge">DEMO</span> <span id="user" class="muted"></span>
+<button class="btn dark" onclick="logout()">Log out</button></div></header>
+<div class="layout"><aside>
+<button class="active" data-view="dash">📊 Dashboard</button><button data-view="trade">₿ Crypto Trade</button>
+<button data-view="positions">📈 Open Positions</button><button data-view="hist">📜 History</button>
+<button data-view="wallet">💳 Wallet</button><button data-view="simulation">🧪 Simulation</button>
+<button id="adminNav" class="hidden" data-view="admin">🛠️ Admin</button><button data-view="profile">⚙️ Profile</button>
+</aside><main>
 
-<div class="layout">
-<aside>
-<button class="active" data-v="dash">📊 Dashboard</button>
-<button data-v="trade">₿ Crypto Trade</button>
-<button data-v="plans">🤖 Plans & Bots</button>
-<button data-v="hist">📜 History</button>
-<button data-v="wallet">💳 Wallet</button>
-<button data-v="profile">⚙️ Profile</button>
-<button data-v="admin">🛠️ Admin</button>
-</aside>
+<section id="dash" class="view active"><div class="title"><div><h1>Crypto Dashboard</h1><span class="muted">Live public market data · simulated trading</span></div><span id="live" class="badge off">LIVE FEED: CONNECTING</span></div>
+<div class="cards"><div class="card"><div class="label">Balance</div><div class="value" id="bal">$10,000.00</div></div><div class="card"><div class="label">Equity</div><div class="value" id="equity">$10,000.00</div></div><div class="card"><div class="label">Open P/L</div><div class="value" id="upl">$0.00</div></div><div class="card"><div class="label">Open Positions</div><div class="value" id="pos">0</div></div></div>
+<div class="grid"><div class="box"><div class="title"><h3 id="dashPair">BTC/USDT</h3><b id="dashPrice">—</b></div><div class="market-status"><span id="pulse" class="pulse"></span><span id="marketText" class="muted">Waiting for Worker market data...</span></div><div class="chart"><canvas id="dashChart"></canvas></div><div class="actions"><button class="btn green" onclick="quick('BUY')">BUY</button><button class="btn red" onclick="quick('SELL')">SELL</button></div><div class="notice">The existing Worker <b>/market</b> WebSocket remains the market gateway. No old HTTP provider is used.</div></div>
+<div class="box"><h3>Markets</h3><div id="markets"></div></div></div></section>
 
-<main>
-<section id="dash" class="view active">
-  <div class="title">
-    <div><h1>Crypto Dashboard</h1><span class="muted">Live public market data · simulated trading</span></div>
-    <span id="live" class="badge off">LIVE FEED: CONNECTING</span>
-  </div>
+<section id="trade" class="view"><div class="title"><h1>Crypto Trading Terminal</h1><span class="badge">DEMO</span></div>
+<div class="grid"><div class="box"><div class="title"><h3 id="tradePair">BTC/USDT</h3><b id="tradePrice">—</b></div><div class="chart"><canvas id="tradeChart"></canvas></div></div>
+<div class="box"><h3>Order Ticket</h3><label class="muted">Asset</label><select id="pair"></select><label class="muted">Direction</label><select id="side"><option>BUY</option><option>SELL</option></select>
+<label class="muted">Position volume (USDT)</label><input id="volume" type="number" min="1" value="1000">
+<label class="muted">Leverage</label><select id="leverage"><option value="1">1x</option><option value="2">2x</option><option value="5">5x</option><option value="10">10x</option><option value="20">20x</option><option value="50">50x</option></select>
+<label class="muted">Stop Loss price</label><input id="sl" type="number" step="any" placeholder="Optional">
+<label class="muted">Take Profit price</label><input id="tp" type="number" step="any" placeholder="Optional">
+<div class="row"><span>Required margin</span><b id="margin">—</b></div><div class="actions"><button class="btn green" onclick="placeTrade()">Open Trade</button></div>
+<div class="notice">Leverage changes required margin and P/L exposure. Orders are simulated only.</div></div></div></section>
 
-  <div class="cards">
-    <div class="card"><div class="label">Balance</div><div class="value" id="bal">$10,000.00</div></div>
-    <div class="card"><div class="label">Today's P/L</div><div class="value up" id="daily">+$0.00</div></div>
-    <div class="card"><div class="label">Open Positions</div><div class="value" id="pos">0</div></div>
-    <div class="card"><div class="label">BTC/USDT</div><div class="value" id="btc">—</div></div>
-  </div>
+<section id="positions" class="view"><h1>Open Positions</h1><div class="box table-wrap"><table><thead><tr><th>Pair</th><th>Side</th><th>Volume</th><th>Lev.</th><th>Entry</th><th>Mark</th><th>P/L</th><th>SL</th><th>TP</th><th></th></tr></thead><tbody id="positionRows"></tbody></table></div></section>
 
-  <div class="grid">
-    <div class="box">
-      <h3>BTC/USDT <span id="dprice" class="muted">—</span></h3>
-      <div class="market-status"><span id="pulse" class="pulse"></span><span id="marketText" class="muted">Waiting for market data...</span></div>
-      <div class="chart">
-        <svg class="spark" viewBox="0 0 1000 310" preserveAspectRatio="none">
-          <polyline id="chartLine" class="line" points="0,155 1000,155"></polyline>
-          <circle id="chartDot" class="dot" cx="990" cy="155" r="5"></circle>
-        </svg>
-      </div>
-      <div class="actions">
-        <button class="btn green" onclick="openTrade('BUY')">BUY BTC</button>
-        <button class="btn red" onclick="openTrade('SELL')">SELL BTC</button>
-      </div>
-      <div class="note">Prices are real public market prices. Orders and balances are simulated.</div>
-    </div>
-    <div class="box">
-      <h3>Account Summary</h3>
-      <div class="row"><span>Balance</span><b id="eq">$10,000.00</b></div>
-      <div class="row"><span>Free Balance</span><b id="free">$10,000.00</b></div>
-      <div class="row"><span>Open P/L</span><b id="upl">$0.00</b></div>
-      <div class="row"><span>Win Rate</span><b class="up">—</b></div>
-    </div>
-  </div>
-</section>
+<section id="hist" class="view"><h1>Closed Trade History</h1><div class="box table-wrap"><table><thead><tr><th>Time</th><th>Pair</th><th>Side</th><th>Volume</th><th>Entry</th><th>Exit</th><th>P/L</th><th>Reason</th></tr></thead><tbody id="historyRows"></tbody></table></div></section>
 
-<section id="trade" class="view">
-  <div class="title"><h1>Crypto Trading Terminal</h1><span id="tlive" class="badge off">LIVE FEED: CONNECTING</span></div>
-  <div class="grid">
-    <div class="box">
-      <h3 id="tradeTitle">BTC/USDT · Live</h3>
-      <div class="chart"><svg class="spark" viewBox="0 0 1000 310" preserveAspectRatio="none"><polyline id="tradeLine" class="line" points="0,155 1000,155"></polyline><circle id="tradeDot" class="dot" cx="990" cy="155" r="5"></circle></svg></div>
-      <div class="row"><span>Current market price</span><b id="tpv">—</b></div>
-    </div>
-    <div class="box">
-      <h3>Order Ticket</h3>
-      <div class="field"><label>Asset</label>
-        <select id="pair" onchange="renderTradePrice()">
-          <option>BTC/USDT</option><option>ETH/USDT</option><option>SOL/USDT</option><option>BNB/USDT</option><option>XRP/USDT</option>
-        </select>
-      </div>
-      <div class="field"><label>Amount (USDT)</label><input id="amt" type="number" min="1" value="1000"></div>
-      <div class="field"><label>Stop Loss</label><input id="sl" placeholder="Market price level"></div>
-      <div class="field"><label>Take Profit</label><input id="tp" placeholder="Market price level"></div>
-      <div class="actions"><button class="btn green" onclick="openTrade('BUY')">Buy</button><button class="btn red" onclick="openTrade('SELL')">Sell</button></div>
-      <div class="note">No real exchange order is submitted.</div>
-    </div>
-  </div>
-</section>
+<section id="wallet" class="view"><h1>Wallet</h1><div class="cards"><div class="card"><div class="label">Demo Balance</div><div class="value" id="walletBalance">$10,000.00</div></div><div class="card"><div class="label">Free Margin</div><div class="value" id="freeMargin">$10,000.00</div></div></div><div class="box" style="margin-top:15px"><button class="btn green" onclick="addFunds()">Add $1,000 demo funds</button><div class="notice">Demo funds have no cash value.</div></div></section>
 
-<section id="plans" class="view">
-  <h1>Plans & Automated Trading</h1>
-  <div class="plans">
-    <div class="plan"><h3>Crypto Standard</h3><p class="muted">Test crypto portfolio strategies.</p><button class="btn" onclick="notify('Crypto Standard activated')">Start</button></div>
-    <div class="plan"><h3>Crypto AI Bot</h3><p class="muted">Test automated crypto strategy execution.</p><button class="btn" onclick="notify('Crypto AI Bot activated')">Activate</button></div>
-    <div class="plan"><h3>Copy Trading</h3><p class="muted">Simulate copying a crypto trader.</p><button class="btn" onclick="notify('Copy Trading activated')">Copy</button></div>
-  </div>
-</section>
+<section id="simulation" class="view"><div class="title"><div><h1>Private Simulation</h1><span class="muted">Controlled-price environment</span></div><span class="badge">SIMULATION</span></div>
+<div class="grid"><div class="box"><h3>Simulation Controls</h3><label class="muted">Pair</label><select id="simPair"></select><div class="row"><span>Live price</span><b id="simLive">—</b></div><div class="row"><span>Simulation price</span><b id="simPrice">—</b></div>
+<label class="muted">Movement amount</label><input id="moveAmount" type="number" min=".01" step="any" value="20">
+<div class="actions"><button class="btn green" onclick="moveSim(1)">BUY ↑</button><button class="btn red" onclick="moveSim(-1)">SELL ↓</button><button class="btn dark" onclick="resetSim()">Use live price</button></div>
+<div class="notice">Example: if BTC is $73,000 and movement is $20, BUY moves it to $73,020 and another BUY to $73,040. The same simulated price drives candles, P/L, TP and SL.</div></div>
+<div class="box"><h3>Simulation Chart</h3><div class="chart"><canvas id="simChart"></canvas></div></div></div></section>
 
-<section id="hist" class="view">
-  <h1>Crypto Trade History</h1>
-  <div class="box table-wrap"><table><thead><tr><th>Time</th><th>Pair</th><th>Side</th><th>Amount</th><th>Entry</th><th>SL</th><th>TP</th><th>Status</th></tr></thead><tbody id="hb"></tbody></table></div>
-</section>
+<section id="profile" class="view"><h1>Profile</h1><div class="box"><div class="row"><span>Name</span><b id="profileName"></b></div><div class="row"><span>Email</span><b id="profileEmail"></b></div></div></section>
 
-<section id="wallet" class="view">
-  <h1>Wallet</h1>
-  <div class="cards"><div class="card"><div class="label">Demo Balance</div><div class="value" id="wb">$10,000.00</div></div></div>
-  <div class="box" style="margin-top:15px"><button class="btn green" onclick="addFunds()">Add demo funds</button> <button class="btn dark" onclick="notify('Withdrawal request created (simulation)')">Request withdrawal</button></div>
-</section>
+<section id="admin" class="view"><div class="title"><h1>Private Admin Dashboard</h1><span class="badge">ADMIN</span></div>
+<div id="adminGate" class="box"><h3>Admin authentication</h3><p class="muted">Enter the designated admin email to unlock the prototype controls.</p><input id="adminEmail" type="email" placeholder="Admin email"><button class="btn" onclick="unlockAdmin()">Authenticate</button><div class="notice danger">This client-side gate is for V1 prototyping. Secure production authentication must be server-side.</div></div>
+<div id="adminPanel" class="hidden"><div class="grid"><div class="box"><h3>Account credit / debit</h3><label class="muted">Amount</label><input id="creditAmount" type="number" min="0" value="1000"><div class="actions"><button class="btn green" onclick="adminBalance(1)">Credit</button><button class="btn red" onclick="adminBalance(-1)">Debit</button></div></div>
+<div class="box"><h3>Market movement engine</h3><label class="muted">Pair</label><select id="adminPair"></select><label class="muted">Movement amount</label><input id="adminMove" type="number" min=".01" step="any" value="20"><div class="actions"><button class="btn green" onclick="adminMove(1)">BUY ↑ amount</button><button class="btn red" onclick="adminMove(-1)">SELL ↓ amount</button></div><div class="notice">Admin movement affects only the simulation layer, never the real external crypto market.</div></div></div>
+<div class="box" style="margin-top:15px"><h3>Activity audit</h3><div id="audit"></div></div></div></section>
 
-<section id="profile" class="view">
-  <h1>Profile</h1>
-  <div class="box"><div class="row"><span>Name</span><b id="pn"></b></div><div class="row"><span>Email</span><b id="pe"></b></div><div class="row"><span>Account</span><b>Crypto Demo</b></div></div>
-</section>
-
-<section id="admin" class="view">
-  <div class="title"><h1>Admin Control Panel</h1><span class="badge">ADMIN</span></div>
-  <div class="grid">
-    <div class="box">
-      <h3>Demo Balance Control</h3>
-      <input id="aa" type="number" value="5000">
-      <div class="actions"><button class="btn green" onclick="admin('add')">Add funds</button><button class="btn red" onclick="admin('remove')">Remove funds</button><button class="btn dark" onclick="admin('set')">Set balance</button></div>
-    </div>
-    <div class="box">
-      <h3>Local Simulation Override</h3>
-      <select id="sp"><option>BTC/USDT</option><option>ETH/USDT</option><option>SOL/USDT</option><option>BNB/USDT</option><option>XRP/USDT</option></select>
-      <input id="sv" type="number" value="100000">
-      <div class="actions"><button class="btn green" onclick="sim('up')">Move UP</button><button class="btn red" onclick="sim('down')">Move DOWN</button><button class="btn dark" onclick="clearOverride()">Use live price</button></div>
-      <div class="note">This is a demo-only local override. It does not move the real external market.</div>
-    </div>
-  </div>
-  <div class="box" style="margin-top:15px"><h3>Admin Audit</h3><div id="audit" class="muted"></div></div>
-</section>
-</main>
-</div>
-</div>
-
-<div id="toast" class="toast"></div>
+</main></div></div><div id="toast" class="toast"></div>
 
 <script>
-const K='devolkscapital_crypto_v3';
-const DEFAULT_PRICES={'BTC/USDT':null,'ETH/USDT':null,'SOL/USDT':null,'BNB/USDT':null,'XRP/USDT':null};
-let s=JSON.parse(localStorage.getItem(K)||'null')||{
-  user:null,balance:10000,trades:[],prices:{...DEFAULT_PRICES},history:{'BTC/USDT':[],'ETH/USDT':[],'SOL/USDT':[],'BNB/USDT':[],'XRP/USDT':[]},live:false,audit:[],overrides:{}
+const ADMIN_EMAIL='devolkscapital@gmail.com';
+const PAIRS=['BTC/USDT','ETH/USDT','SOL/USDT','BNB/USDT','XRP/USDT'];
+const SYMBOLS={BTCUSDT:'BTC/USDT',ETHUSDT:'ETH/USDT',SOLUSDT:'SOL/USDT',BNBUSDT:'BNB/USDT',XRPUSDT:'XRP/USDT'};
+const KEY='devolkscapital_v1_state';
+let s=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ user:null,balance:10000,prices:{},history:{},simulation:{},positions:[],closed:[],audit:[],selected:'BTC/USDT',live:false,admin:false
 };
-const q=x=>document.getElementById(x);
-const save=()=>localStorage.setItem(K,JSON.stringify(s));
-const money=n=>'$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-const priceOf=p=>s.overrides[p]??s.prices[p];
+const q=id=>document.getElementById(id), money=n=>'$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const save=()=>localStorage.setItem(KEY,JSON.stringify(s));
+const livePrice=p=>s.prices[p];
+const markPrice=p=>s.simulation[p]??s.prices[p];
+function toast(t){const x=q('toast');x.textContent=t;x.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>x.style.display='none',2200)}
+function fillSelect(id){q(id).innerHTML=PAIRS.map(p=>'<option>'+p+'</option>').join('')}
+['pair','simPair','adminPair'].forEach(fillSelect);
 
-function notify(t){let x=q('toast');x.textContent=t;x.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(()=>x.style.display='none',2200)}
+document.querySelectorAll('aside button[data-view]').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('aside button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));q(b.dataset.view).classList.add('active');render();
+});
 
-function currentOpenPL(){
-  return s.trades.filter(t=>t.status==='Open').reduce((sum,t)=>{
-    const p=priceOf(t.pair); if(!p)return sum;
-    const units=t.amount/t.entryNum;
-    return sum+(t.side==='BUY'?(p-t.entryNum)*units:(t.entryNum-p)*units);
-  },0);
+function positionPL(t){
+ const p=markPrice(t.pair);if(!p)return 0;
+ return (t.side==='BUY'?(p-t.entry):(t.entry-p))*t.quantity;
 }
-
-function updateChart(points,lineId,dotId){
-  if(points.length<2)return;
-  const vals=points.map(Number), min=Math.min(...vals), max=Math.max(...vals), range=max-min||1;
-  const pts=vals.map((v,i)=>`${(i/(vals.length-1))*1000},${285-((v-min)/range)*250}`).join(' ');
-  q(lineId).setAttribute('points',pts);
-  const last=pts.split(' ').pop().split(',');
-  q(dotId).setAttribute('cx',last[0]);q(dotId).setAttribute('cy',last[1]);
+function usedMargin(){return s.positions.reduce((a,t)=>a+t.margin,0)}
+function openPL(){return s.positions.reduce((a,t)=>a+positionPL(t),0)}
+function equity(){return s.balance+usedMargin()+openPL()}
+function freeMargin(){return s.balance}
+function quick(side){q('pair').value=s.selected;q('side').value=side;q('volume').value=1000;placeTrade()}
+function placeTrade(){
+ const pair=q('pair').value,side=q('side').value,p=markPrice(pair),volume=Number(q('volume').value),lev=Number(q('leverage').value),margin=volume/lev;
+ if(!p||volume<=0)return toast('Wait for a valid price and enter volume');
+ if(margin>freeMargin())return toast('Insufficient free margin');
+ const sl=Number(q('sl').value)||null,tp=Number(q('tp').value)||null;
+ if(sl&&((side==='BUY'&&sl>=p)||(side==='SELL'&&sl<=p)))return toast('Invalid stop loss for this side');
+ if(tp&&((side==='BUY'&&tp<=p)||(side==='SELL'&&tp>=p)))return toast('Invalid take profit for this side');
+ s.balance-=margin;
+ s.positions.unshift({id:(crypto.randomUUID?crypto.randomUUID():Date.now()+''),time:new Date().toLocaleString(),pair,side,volume,leverage,margin,quantity:(volume*lev)/p,entry:p,sl,tp});
+ s.audit.push({time:new Date().toLocaleString(),text:'Demo trade opened: '+side+' '+pair+' '+money(volume)});
+ save();render();toast(side+' '+pair+' opened at '+money(p));
 }
-
+function closePosition(id,reason='Manual close'){
+ const i=s.positions.findIndex(t=>t.id===id);if(i<0)return;
+ const t=s.positions[i],p=markPrice(t.pair);if(!p)return;const pl=positionPL(t);
+ s.balance+=t.margin+pl;s.closed.unshift({...t,exit:p,pl,reason,closeTime:new Date().toLocaleString()});s.positions.splice(i,1);
+ s.audit.push({time:new Date().toLocaleString(),text:'Position closed: '+t.pair+' '+reason+' '+money(pl)});save();render();
+}
+function checkStops(){
+ for(const t of [...s.positions]){const p=markPrice(t.pair);if(!p)continue;
+  if(t.side==='BUY'&&t.sl&&p<=t.sl)closePosition(t.id,'Stop Loss');
+  else if(t.side==='BUY'&&t.tp&&p>=t.tp)closePosition(t.id,'Take Profit');
+  else if(t.side==='SELL'&&t.sl&&p>=t.sl)closePosition(t.id,'Stop Loss');
+  else if(t.side==='SELL'&&t.tp&&p<=t.tp)closePosition(t.id,'Take Profit');
+ }
+}
+function draw(id,vals){
+ const c=q(id),r=c.getBoundingClientRect();if(!r.width)return;c.width=r.width*devicePixelRatio;c.height=r.height*devicePixelRatio;
+ const ctx=c.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);ctx.clearRect(0,0,r.width,r.height);
+ if(vals.length<2)return;const min=Math.min(...vals),max=Math.max(...vals),range=max-min||1;
+ ctx.beginPath();vals.forEach((v,i)=>{const x=i*r.width/(vals.length-1),y=r.height-25-(v-min)/range*(r.height-45);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.lineWidth=2;ctx.strokeStyle='#27d69b';ctx.stroke();
+}
 function render(){
-  const btc=priceOf('BTC/USDT');
-  q('bal').textContent=money(s.balance);q('wb').textContent=money(s.balance);
-  q('eq').textContent=money(s.balance);q('free').textContent=money(s.balance);
-  q('btc').textContent=btc?money(btc):'—';q('dprice').textContent=btc?money(btc):'—';
-  q('pos').textContent=s.trades.filter(t=>t.status==='Open').length;
-  const upl=currentOpenPL();q('upl').textContent=(upl>=0?'+':'')+money(upl);q('upl').className=upl>=0?'up':'down';
-  q('daily').textContent=(upl>=0?'+':'')+money(upl);
-  const live=s.live;
-  q('live').textContent=live?'LIVE DATA':'LIVE FEED: OFFLINE';
-  q('tlive').textContent=live?'LIVE DATA':'LIVE FEED: OFFLINE';
-  q('live').classList.toggle('off',!live);q('tlive').classList.toggle('off',!live);
-  q('pulse').classList.toggle('on',live);q('marketText').textContent=live?'Real public market data connected':'Waiting for Worker market API';
-  q('hb').innerHTML=s.trades.length?s.trades.map(t=>`<tr><td>${t.time}</td><td>${t.pair}</td><td class="${t.side==='BUY'?'up':'down'}">${t.side}</td><td>${money(t.amount)}</td><td>${money(t.entryNum)}</td><td>${t.sl||'—'}</td><td>${t.tp||'—'}</td><td>${t.status}</td></tr>`).join(''):'<tr><td colspan="8" class="muted">No trades yet.</td></tr>';
-  q('audit').innerHTML=s.audit.slice().reverse().map(a=>`<div class="row"><span>${a.time}</span><b>${a.text}</b></div>`).join('')||'No changes yet.';
-  renderTradePrice();
-  updateChart(s.history['BTC/USDT']||[], 'chartLine','chartDot');
-  const pair=q('pair')?.value||'BTC/USDT';updateChart(s.history[pair]||[], 'tradeLine','tradeDot');
-}function renderTradePrice(){
-  const pair=q('pair').value, p=priceOf(pair);
-  q('tradeTitle').textContent=pair+' · Live';
-  q('tpv').textContent=p?money(p):'—';
-  updateChart(s.history[pair]||[], 'tradeLine','tradeDot');
+ const pl=openPL(),eq=equity(),p=s.selected,mp=markPrice(p);
+ q('bal').textContent=money(s.balance);q('equity').textContent=money(eq);q('upl').textContent=(pl>=0?'+':'')+money(pl);q('upl').className='value '+(pl>=0?'up':'down');q('pos').textContent=s.positions.length;q('walletBalance').textContent=money(s.balance);q('freeMargin').textContent=money(freeMargin());
+ q('dashPair').textContent=p;q('dashPrice').textContent=mp?money(mp):'—';q('simLive').textContent=livePrice(p)?money(livePrice(p)):'—';q('simPrice').textContent=mp?money(mp):'—';
+ q('live').textContent=s.live?'LIVE FEED: CONNECTED':'LIVE FEED: OFFLINE';q('live').classList.toggle('off',!s.live);q('pulse').classList.toggle('on',s.live);q('marketText').textContent=s.live?'Real public market data connected':'Waiting for Worker market data';
+ q('markets').innerHTML=PAIRS.map(x=>'<div class="row" style="cursor:pointer" onclick="selectPair(\\''+x+'\\')"><span>'+x+'</span><b>'+(markPrice(x)?money(markPrice(x)):'—')+'</b></div>').join('');
+ q('positionRows').innerHTML=s.positions.length?s.positions.map(t=>'<tr><td>'+t.pair+'</td><td class="'+(t.side==='BUY'?'up':'down')+'">'+t.side+'</td><td>'+money(t.volume)+'</td><td>'+t.leverage+'x</td><td>'+money(t.entry)+'</td><td>'+(markPrice(t.pair)?money(markPrice(t.pair)):'—')+'</td><td class="'+(positionPL(t)>=0?'up':'down')+'">'+(positionPL(t)>=0?'+':'')+money(positionPL(t))+'</td><td>'+(t.sl?money(t.sl):'—')+'</td><td>'+(t.tp?money(t.tp):'—')+'</td><td><button class="btn dark" onclick="closePosition(\\''+t.id+'\\')">Close</button></td></tr>').join(''):'<tr><td colspan="10" class="muted">No open positions.</td></tr>';
+ q('historyRows').innerHTML=s.closed.length?s.closed.map(t=>'<tr><td>'+t.closeTime+'</td><td>'+t.pair+'</td><td>'+t.side+'</td><td>'+money(t.volume)+'</td><td>'+money(t.entry)+'</td><td>'+money(t.exit)+'</td><td class="'+(t.pl>=0?'up':'down')+'">'+(t.pl>=0?'+':'')+money(t.pl)+'</td><td>'+t.reason+'</td></tr>').join(''):'<tr><td colspan="8" class="muted">No closed trades.</td></tr>';
+ q('profileName').textContent=s.user?.name||'';q('profileEmail').textContent=s.user?.email||'';
+ q('adminNav').classList.toggle('hidden',!s.admin);q('adminPanel').classList.toggle('hidden',!s.admin);q('adminGate').classList.toggle('hidden',s.admin);
+ q('audit').innerHTML=s.audit.slice().reverse().map(a=>'<div class="row"><span>'+a.time+'</span><b>'+a.text+'</b></div>').join('')||'<span class="muted">No activity.</span>';
+ q('tradePair').textContent=q('pair').value;q('tradePrice').textContent=markPrice(q('pair').value)?money(markPrice(q('pair').value)):'—';
+ q('margin').textContent=money(Number(q('volume').value||0)/Number(q('leverage').value||1));
+ draw('dashChart',s.history[p]||[]);draw('tradeChart',s.history[q('pair').value]||[]);draw('simChart',s.history[p]||[]);
 }
+function selectPair(p){s.selected=p;q('pair').value=p;q('simPair').value=p;save();render()}
+q('pair').onchange=render;q('volume').oninput=render;q('leverage').onchange=render;q('simPair').onchange=()=>{s.selected=q('simPair').value;save();render()};
 
-let marketSocket = null;
-let marketReconnectTimer = null;
-
-function connectMarket(){
-  if (marketSocket && (marketSocket.readyState === WebSocket.OPEN ||
-                       marketSocket.readyState === WebSocket.CONNECTING)) return;
-
-  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  marketSocket = new WebSocket(protocol + '//' + location.host + '/market');
-
-  marketSocket.onopen = () => {
-    s.live = true;
-    render();
-  };
-
-  marketSocket.onmessage = event => {
-    try{
-      const msg = JSON.parse(event.data);
-
-      if(msg.type === 'error'){
-        s.live = false;
-        render();
-        return;
-      }
-
-      const payload = msg.data || msg;
-      const symbol = payload.s;
-      const closePrice = Number(payload.c);
-
-      const map = {
-        BTCUSDT:'BTC/USDT',
-        ETHUSDT:'ETH/USDT',
-        SOLUSDT:'SOL/USDT',
-        BNBUSDT:'BNB/USDT',
-        XRPUSDT:'XRP/USDT'
-      };
-
-      const pair = map[symbol];
-
-      if(pair && Number.isFinite(closePrice)){
-        s.prices[pair] = closePrice;
-        if(!s.history[pair]) s.history[pair] = [];
-        s.history[pair].push(closePrice);
-        if(s.history[pair].length > 60) s.history[pair].shift();
-        s.live = true;
-        save();
-        render();
-      }
-    }catch(e){
-      s.live = false;
-      render();
-    }
-  };
-
-  marketSocket.onerror = () => {
-    s.live = false;
-    render();
-  };
-
-  marketSocket.onclose = () => {
-    s.live = false;
-    render();
-    clearTimeout(marketReconnectTimer);
-    marketReconnectTimer = setTimeout(connectMarket, 3000);
-  };
+function moveSim(dir){
+ const p=q('simPair').value,a=Number(q('moveAmount').value),base=s.simulation[p]??livePrice(p);
+ if(!base||a<=0)return toast('Enter a valid movement amount and wait for price');
+ s.simulation[p]=base+dir*a;s.history[p]??=[];s.history[p].push(s.simulation[p]);if(s.history[p].length>120)s.history[p].shift();
+ s.audit.push({time:new Date().toLocaleString(),text:'Simulation '+p+' moved '+(dir>0?'+':'-')+money(a)});save();checkStops();render();toast(p+' moved '+(dir>0?'+':'-')+money(a));
 }
-
-function openTrade(side){
-  const pair=q('pair').value, p=priceOf(pair);
-  if(!p)return notify('Live market price is not available');
-  const a=Number(q('amt').value||0);
-  if(a<=0)return notify('Enter a valid amount');
-  if(a>s.balance)return notify('Insufficient demo balance');
-  s.balance-=a;
-  s.trades.unshift({
-    time:new Date().toLocaleTimeString(),
-    pair,side,amount:a,entryNum:p,
-    sl:q('sl').value||'—',tp:q('tp').value||'—',
-    status:'Open'
-  });
-  save();render();notify(side+' '+pair+' simulated order opened at '+money(p));
-}
-
-function admin(t){
-  const n=Number(q('aa').value||0);
-  if(t==='add')s.balance+=n;if(t==='remove')s.balance=Math.max(0,s.balance-n);if(t==='set')s.balance=n;
-  s.audit.push({time:new Date().toLocaleString(),text:'Admin '+t+' '+money(n)+' demo balance'});
-  save();render();notify('Balance updated');
-}
-
-function sim(d){
-  const p=q('sp').value,n=Number(q('sv').value||0),next=d==='up'?n*1.005:n*.995;
-  s.overrides[p]=next;s.audit.push({time:new Date().toLocaleString(),text:'Local simulation override '+p+' '+d.toUpperCase()});
-  save();render();notify(p+' local simulation moved '+d.toUpperCase());
-}
-function clearOverride(){
-  const p=q('sp').value;delete s.overrides[p];save();render();notify(p+' returned to live price');
-}
-function addFunds(){s.balance+=1000;save();render();notify('$1,000 demo funds added')}
-function logout(){s.user=null;save();location.reload()}
+function resetSim(){const p=q('simPair').value;delete s.simulation[p];save();render();toast(p+' returned to live price')}
+function adminMove(dir){q('simPair').value=q('adminPair').value;q('moveAmount').value=q('adminMove').value;moveSim(dir)}
+function unlockAdmin(){if(q('adminEmail').value.trim().toLowerCase()!==ADMIN_EMAIL)return toast('Admin authentication failed');s.admin=true;save();render();toast('Admin controls unlocked')}
+function adminBalance(dir){const n=Numberr(q('creditAmount').value);if(!n)return;if(dir>0)s.balance+=n;else s.balance=Math.max(0,s.balance-n);s.audit.push({time:new Date().toLocaleString(),text:'Admin '+(dir>0?'credit ':'debit ')+money(n)});save();render();toast('Balance updated')}
+function addFunds(){s.balance+=1000;s.audit.push({time:new Date().toLocaleString(),text:'User added $1,000 demo funds'});save();render();toast('$1,000 demo funds added')}
+function logout(){s.user=null;s.admin=false;save();location.reload()}
 
 let signup=true;
-q('af').onsubmit=e=>{
-  e.preventDefault();
-  const email=q('email').value,pw=q('pw').value;
-  if(pw.length<6)return notify('Password must be at least 6 characters');
-  if(signup){s.user={name:q('name').value||'Demo Trader',email,password:pw};save();show()}
-  else{if(!s.user||s.user.email!==email||s.user.password!==pw)return notify('Login details not found');show()}
-};
-function show(){
-  q('auth').style.display='none';q('app').style.display='block';
-  q('user').textContent=s.user.name+' · '+s.user.email;
-  q('pn').textContent=s.user.name;q('pe').textContent=s.user.email;render();
+q('authForm').onsubmit=e=>{e.preventDefault();const email=q('email').value.trim().toLowerCase(),pw=q('pw').value;if(pw.length<6)return toast('Password must be at least 6 characters');
+ if(signup){s.user={name:q('name').value.trim()||'Demo Trader',email,password:pw};save();showApp()}else{if(!s.user||s.user.email!==email||s.user.password!==pw)return toast('Login details not found');showApp()}};
+q('authToggle').onclick=()=>{signup=!signup;q('authTitle').textContent=signup?'Create your account':'Welcome back';q('authBtn').textContent=signup?'Create account':'Sign in';q('nameWrap').style.display=signup?'block':'none'};
+
+function showApp(){q('auth').style.display='none';q('app').classList.remove('hidden');q('user').textContent=s.user.name+' · '+s.user.email;render()}
+
+let ws,reconnectTimer;
+function connectMarket(){
+ if(ws&&(ws.readyState===WebSocket.OPEN||ws.readyState===WebSocket.CONNECTING))return;
+ const protocol=location.protocol==='https:'?'wss:':'ws:';
+ ws=new WebSocket(protocol+'//'+location.host+'/market');
+ ws.onopen=()=>{s.live=true;render()};
+ ws.onmessage=e=>{try{
+   const msg=JSON.parse(e.data),payload=msg.data||msg,symbol=payload.s,price=Number(payload.c),pair=SYMBOLS[symbol];
+   if(pair&&Number.isFinite(price)){s.prices[pair]=price;s.history[pair]??=[];if(s.simulation[pair]==null){s.history[pair].push(price);if(s.history[pair].length>120)s.history[pair].shift()}s.live=true;checkStops();save();render()}
+ }catch(err){}};
+ ws.onerror=()=>{s.live=false;render()};
+ ws.onclose=()=>{s.live=false;render();clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connectMarket,3000)};
 }
-q('toggle').onclick=()=>{
-  signup=!signup;q('at').textContent=signup?'Create your account':'Welcome back';
-  q('ab').textContent=signup?'Create account':'Sign in';q('nw').style.display=signup?'block':'none';
-};
-document.querySelectorAll('aside button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('aside button').forEach(x=>x.classList.remove('active'));b.classList.add('active');
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));q(b.dataset.v).classList.add('active');render();
-});
-if(s.user)show();else{q('app').style.display='none'}
-connectMarket();
+if(s.user)showApp();connectMarket();window.addEventListener('resize',render);
 </script>
-</body>
-</html>
+</body></html>
