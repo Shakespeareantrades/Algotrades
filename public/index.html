@@ -50,10 +50,13 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
 .trade-card.open .trade-details{display:block}
 @media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
 @media(max-width:520px){.cards{grid-template-columns:1fr}main{padding:15px}.top{padding:0 12px}.chart{height:330px}.trade-bottom{align-items:flex-end}.trade-card{padding:14px}}
+
+.chart{touch-action:none}
+.chart-shell{position:relative}.toolbar{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}.tool{border:1px solid #29445d;background:#0b1a2a;color:#9ab0c3;border-radius:7px;padding:6px 9px;cursor:pointer;font-size:11px}.tool.active{background:#24486b;color:#fff;border-color:#659cff}.chart-status{font-size:11px;color:#7f96aa;margin:4px 0}
 </style>
 </head>
 <body>
-<div id="auth" class="auth">
+  <div id="auth" class="auth">
   <div class="authbox">
     <div class="logo">Devolks<b>Capital</b></div>
     <h1 id="authTitle">Create your account</h1>
@@ -103,7 +106,7 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
       <div class="title"><h3 id="dashPair">BTC/USDT</h3><b id="dashPrice">—</b></div>
       <div><span id="pulse" class="pulse"></span> <span id="marketText" class="muted">Waiting for Worker market data...</span></div>
       <div class="chart-toolbar" id="dashTF"></div>
-      <div class="chart"><canvas id="dashChart"></canvas></div>
+      <div class="toolbar" id="dashChartTools"></div><div class="chart-shell"><div class="chart"><canvas id="dashChart"></canvas></div></div><div class="chart-status" id="dashChartStatus">Scroll to zoom · drag to pan · select a drawing tool</div>
       <div class="actions"><button class="btn green" onclick="quick('BUY')">BUY</button><button class="btn red" onclick="quick('SELL')">SELL</button></div>
       <div class="notice">Candles use Binance OHLC/Kline data through the Worker. Orders remain simulated.</div>
     </div>
@@ -117,7 +120,7 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
     <div class="box">
       <div class="title"><h3 id="tradePair">BTC/USDT</h3><b id="tradePrice">—</b></div>
       <div class="chart-toolbar" id="tradeTF"></div>
-      <div class="chart"><canvas id="tradeChart"></canvas></div>
+      <div class="toolbar" id="tradeChartTools"></div><div class="chart-shell"><div class="chart"><canvas id="tradeChart"></canvas></div></div><div class="chart-status" id="tradeChartStatus">Scroll to zoom · drag to pan · select a drawing tool</div>
     </div>
     <div class="box">
       <h3>Order Ticket</h3>
@@ -131,7 +134,9 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
       <div class="actions"><button class="btn green" onclick="placeTrade()">Open Trade</button></div>
     </div>
   </div>
-</section><section id="positions" class="view">
+</section>
+
+<section id="positions" class="view">
   <h1>Open Positions</h1>
   <div class="box table-wrap"><table><thead><tr><th>Pair</th><th>Side</th><th>Volume</th><th>Lev.</th><th>Entry</th><th>Mark</th><th>P/L</th><th>SL</th><th>TP</th><th></th></tr></thead><tbody id="positionRows"></tbody></table></div>
 </section>
@@ -153,7 +158,6 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
   <div class="cards"><div class="card"><div class="label">Demo Balance</div><div class="value" id="walletBalance">$10,000.00</div></div><div class="card"><div class="label">Free Margin</div><div class="value" id="freeMargin">$10,000.00</div></div></div>
   <div class="box" style="margin-top:15px"><button class="btn green" onclick="addFunds()">Add $1,000 demo funds</button></div>
 </section>
-
 <section id="simulation" class="view">
   <div class="title"><h1>Private Simulation</h1><span class="badge">SIMULATION</span></div>
   <div class="grid">
@@ -166,7 +170,7 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
       <div class="actions"><button class="btn green" onclick="moveSim(1)">BUY ↑</button><button class="btn red" onclick="moveSim(-1)">SELL ↓</button><button class="btn dark" onclick="resetSim()">Use live price</button></div>
       <div class="notice">Each movement feeds the simulated price into the chart, open-position P/L and TP/SL engine.</div>
     </div>
-    <div class="box"><h3>Simulation Chart</h3><div class="chart"><canvas id="simChart"></canvas></div></div>
+    <div class="box"><h3>Simulation Chart</h3><div class="toolbar" id="simChartTools"></div><div class="chart-shell"><div class="chart"><canvas id="simChart"></canvas></div></div><div class="chart-status" id="simChartStatus">Scroll to zoom · drag to pan · select a drawing tool</div></div>
   </div>
 </section>
 
@@ -176,13 +180,13 @@ th,td{padding:11px 8px;text-align:left;border-bottom:1px solid #1d3349}
 
 <section id="admin" class="view">
   <div class="title"><h1>Private Admin Dashboard</h1><span class="badge">ADMIN</span></div>
-  <div id="adminGate" class="box"><h3>Admin authentication</h3><p class="muted">Enter the designated admin email.</p><input id="adminEmail" type="email" placeholder="Admin email"><button class="btn" onclick="unlockAdmin()">Authenticate</button><div class="notice">V1 browser gate only. Production admin security requires server-side authentication.</div></div>
+  <div id="adminGate" class="box"><h3>Admin authentication</h3><p class="muted">Only the designated DevolksCapital admin account can enter this area.</p><input id="adminEmail" type="email" placeholder="Admin email"><input id="adminPassword" type="password" placeholder="Admin password"><button class="btn" onclick="unlockAdmin()">Sign in as Admin</button><div class="notice">Admin authorization is verified by the Worker. The password is not stored in this page.</div></div>
   <div id="adminPanel" class="hidden">
     <div class="grid">
-      <div class="box"><h3>Account credit / debit</h3><input id="creditAmount" type="number" min="0" value="1000"><div class="actions"><button class="btn green" onclick="adminBalance(1)">Credit</button><button class="btn red" onclick="adminBalance(-1)">Debit</button></div></div>
+      <div class="box"><h3>Account credit / debit</h3><label class="muted">User</label><select id="adminUser"><option value="">Select user</option></select><input id="creditAmount" type="number" min="0" value="1000"><div class="actions"><button class="btn green" onclick="adminBalance(1)">Credit</button><button class="btn red" onclick="adminBalance(-1)">Debit</button></div></div>
       <div class="box"><h3>Market movement engine</h3><label class="muted">Pair</label><select id="adminPair"></select><label class="muted">Movement amount</label><input id="adminMove" type="number" min=".01" step="any" value="20"><div class="actions"><button class="btn green" onclick="adminMove(1)">BUY ↑</button><button class="btn red" onclick="adminMove(-1)">SELL ↓</button></div></div>
     </div>
-    <div class="box" style="margin-top:15px"><h3>Activity audit</h3><div id="audit"></div></div>
+    <div class="box" style="margin-top:15px"><h3>Shared activity</h3><div id="audit"></div><div class="row"><span>Server storage</span><b id="serverStatus">Checking…</b></div><div class="row"><span>Registered users</span><b id="adminUsers">—</b></div><div class="row"><span>Open trades</span><b id="adminTrades">—</b></div></div>
   </div>
 </section>
 </main></div></div>
@@ -213,8 +217,7 @@ const notify=t=>{let x=q('toast');x.textContent=t;x.style.display='block';clearT
 function fillSelect(id){const el=q(id);if(!el)return;el.innerHTML=PAIRS.map(p=>`<option value="${p}">${p}</option>`).join('');}
 ['pair','simPair','adminPair'].forEach(fillSelect);
 q('pair').value=s.selected;q('simPair').value=s.selected;q('adminPair').value=s.selected;
-
-function pl(t){
+  function pl(t){
   const p=markPrice(t.pair);
   if(!p)return 0;
   return (t.side==='BUY'?(p-t.entry):(t.entry-p))*t.quantity;
@@ -232,45 +235,17 @@ function candleFor(p){
   const arr=s.candles[p]||[];
   return arr.length?arr:[];
 }
-  function drawCandles(id,pair){
-  const c=q(id);if(!c)return;
-  const box=c.getBoundingClientRect();const d=window.devicePixelRatio||1;
-  const w=Math.max(320,box.width),h=Math.max(250,box.height);
-  c.width=w*d;c.height=h*d;
-  const ctx=c.getContext('2d');ctx.scale(d,d);ctx.clearRect(0,0,w,h);
-  const data=candleFor(pair).slice(-70);
-  if(data.length<2){
-    ctx.fillStyle='#8fa4b8';ctx.font='12px Arial';ctx.fillText('Waiting for candlestick data…',18,28);return;
-  }
-  const vals=data.flatMap(x=>[x.h,x.l]);
-  const min=Math.min(...vals),max=Math.max(...vals),pad=(max-min||1)*.08;
-  const lo=min-pad,hi=max+pad,range=hi-lo;
-  const left=42,right=10,top=12,bottom=25;
-  const cw=(w-left-right)/data.length;
-  const py=v=>top+(hi-v)/range*(h-top-bottom);
-  ctx.strokeStyle='#183049';ctx.lineWidth=1;
-  for(let i=0;i<5;i++){let y=top+i*(h-top-bottom)/4;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke()}
-  ctx.fillStyle='#8fa4b8';ctx.font='10px Arial';
-  for(let i=0;i<5;i++){let v=hi-i*range/4;ctx.fillText(formatPrice(v),2,top+i*(h-top-bottom)/4+3)}
-  data.forEach((x,i)=>{
-    const cx=left+i*cw+cw/2,yo=py(x.o),yc=py(x.c),yh=py(x.h),yl=py(x.l);
-    const up=x.c>=x.o;ctx.strokeStyle=up?'#27d69b':'#ff6170';ctx.fillStyle=up?'#27d69b':'#ff6170';
-    ctx.beginPath();ctx.moveTo(cx,yh);ctx.lineTo(cx,yl);ctx.stroke();
-    const bodyY=Math.min(yo,yc),bodyH=Math.max(1,Math.abs(yc-yo));
-    ctx.fillRect(Math.max(left,cx-cw*.32),bodyY,Math.max(2,cw*.64),bodyH);
-  });
-  const mp=markPrice(pair);
-  if(mp){
-    const y=py(mp);ctx.strokeStyle='#659cff';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='#659cff';ctx.fillRect(w-65,y-9,65,18);ctx.fillStyle='#fff';ctx.fillText(formatPrice(mp),w-61,y+3);
-  }
-  const related=s.positions.filter(t=>t.pair===pair);
-  related.forEach(t=>{
-    const y=py(t.entry);ctx.strokeStyle=t.side==='BUY'?'#39a9ff':'#ff6170';ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=t.side==='BUY'?'#39a9ff':'#ff6170';ctx.font='11px Arial';ctx.fillText(t.side+' '+formatPrice(t.entry),left+5,Math.max(12,y-4));
-    if(t.tp){const ty=py(t.tp);ctx.strokeStyle='#d5c62c';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(left,ty);ctx.lineTo(w-right,ty);ctx.stroke();ctx.setLineDash([])}
-    if(t.sl){const sy=py(t.sl);ctx.strokeStyle='#ff6170';ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(left,sy);ctx.lineTo(w-right,sy);ctx.stroke();ctx.setLineDash([])}
-  });
+
+function drawCandles(id,pair){
+  const c=q(id);if(!c)return;bindChart(id);initChartTools(id);
+  const box=c.getBoundingClientRect();const d=devicePixelRatio||1;const w=Math.max(320,box.width),h=Math.max(250,box.height);c.width=w*d;c.height=h*d;
+  const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);const data=visibleData(id,pair);
+  if(data.length<2){ctx.fillStyle='#8fa4b8';ctx.font='12px Arial';ctx.fillText('Waiting for candlestick data…',18,28);return}
+  const g=chartGeometry(id,pair);ctx.strokeStyle='#183049';ctx.lineWidth=1;for(let i=0;i<5;i++){let y=g.top+i*(h-g.top-g.bottom)/4;ctx.beginPath();ctx.moveTo(g.left,y);ctx.lineTo(w-g.right,y);ctx.stroke()}
+  ctx.fillStyle='#8fa4b8';ctx.font='10px Arial';for(let i=0;i<5;i++){let v=g.hi-i*(g.hi-g.lo)/4;ctx.fillText(formatPrice(v),2,g.top+i*(h-g.top-g.bottom)/4+3)}
+  data.forEach((x,i)=>{const cx=g.cx(i),yo=g.py(x.o),yc=g.py(x.c),yh=g.py(x.h),yl=g.py(x.l),up=x.c>=x.o;ctx.strokeStyle=up?'#27d69b':'#ff6170';ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.moveTo(cx,yh);ctx.lineTo(cx,yl);ctx.stroke();const by=Math.min(yo,yc),bh=Math.max(1,Math.abs(yc-yo));ctx.fillRect(Math.max(g.left,cx-g.cw()*.32),by,Math.max(2,g.cw()*.64),bh)});
+  const mp=markPrice(pair);if(mp){const y=g.py(mp);ctx.strokeStyle='#659cff';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(g.left,y);ctx.lineTo(w-g.right,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#659cff';ctx.fillRect(w-65,y-9,65,18);ctx.fillStyle='#fff';ctx.fillText(formatPrice(mp),w-61,y+3)}
+  drawOverlay(id,ctx,g);
 }
 function formatPrice(v){
   v=Number(v);if(!Number.isFinite(v))return '—';
@@ -291,7 +266,7 @@ async function loadHistorical(pair=s.selected){
     s.candles[pair]=rows.map(normalizeKline);
     if(rows.length){s.prices[pair]=Number(rows[rows.length-1][4]);}
     save();renderCharts();
-  }catch(e){}
+  }catch(e){const st=q('dashChartStatus');if(st)st.textContent='Candle history failed to load; retrying…'}
 }
 async function loadAllHistorical(){
   await Promise.all(PAIRS.map(p=>loadHistorical(p)));
@@ -334,9 +309,9 @@ function tradeCard(t,closed){
     '<div class="trade-head"><div><b>◉ '+t.pair.replace('/USDT','')+'</b><span class="chip '+(t.tp?'tp':'')+'">TP</span><span class="chip">SL</span></div><b class="'+cls+'">'+(profit>=0?'+':'')+money(profit)+'</b></div>'+
     '<div class="trade-bottom"><div><div class="'+(t.side==='BUY'?'side-buy':'side-sell')+'">'+(t.side==='BUY'?'Buy':'Sell')+' '+(t.lots||formatLots(t.volume,t.entry))+' lots at '+formatPrice(t.entry)+'</div></div><div class="trade-meta">'+time+'</div></div>'+
     '<div class="trade-details"><div class="row"><span>Pair</span><b>'+t.pair+'</b></div><div class="row"><span>Direction</span><b class="'+(t.side==='BUY'?'side-buy':'side-sell')+'">'+t.side+'</b></div><div class="row"><span>Volume</span><b>'+money(t.volume)+'</b></div><div class="row"><span>Leverage</span><b>'+t.leverage+'x</b></div><div class="row"><span>Entry</span><b>'+formatPrice(t.entry)+'</b></div><div class="row"><span>Exit</span><b>'+ (closed?formatPrice(t.exit):'—')+'</b></div><div class="row"><span>Stop Loss</span><b>'+ (t.sl?formatPrice(t.sl):'—')+'</b></div><div class="row"><span>Take Profit</span><b>'+ (t.tp?formatPrice(t.tp):'—')+'</b></div><div class="row"><span>Margin</span><b>'+money(t.margin)+'</b></div><div class="row"><span>Result</span><b class="'+cls+'">'+(profit>=0?'+':'')+money(profit)+'</b></div><div class="row"><span>Reason</span><b>'+(closed?t.reason:'Open')+'</b></div></div></div>';
-}
-function formatLots(volume,entry){return (Number(volume||0)/Math.max(Number(entry||1),1)).toFixed(4)}
-  function render(){
+     }function formatLots(volume,entry){return (Number(volume||0)/Math.max(Number(entry||1),1)).toFixed(4)}
+
+function render(){
   const p=s.selected,m=markPrice(p),u=openPL();
   q('bal').textContent=money(s.balance);q('equity').textContent=money(equity());
   q('upl').textContent=(u>=0?'+':'')+money(u);q('upl').className='value '+(u>=0?'up':'down');
@@ -388,19 +363,17 @@ function makeSimCandle(pair,newPrice){
   else{last.c=newPrice;last.h=Math.max(last.h,newPrice);last.l=Math.min(last.l,newPrice)}
   s.candles[pair]=arr;
 }
-function moveSim(dir){
-  const p=q('simPair').value,a=+q('moveAmount').value,b=markPrice(p);
-  if(!b||a<=0)return notify('Invalid movement');
-  const next=b+dir*a;s.simulation[p]=next;s.prices[p]=next;makeSimCandle(p,next);save();checkStops();render();notify(p+' moved '+(dir>0?'+':'-')+money(a));
-}
-function resetSim(){const p=q('simPair').value;delete s.simulation[p];if(livePrice(p))s.prices[p]=livePrice(p);save();render();notify('Returned to live price')}
-function adminMove(dir){q('simPair').value=q('adminPair').value;q('moveAmount').value=q('adminMove').value;moveSim(dir)}
-function unlockAdmin(){if(q('adminEmail').value.trim().toLowerCase()!==ADMIN_EMAIL)return notify('Admin authentication failed');s.admin=true;save();render();notify('Admin unlocked')}
-function adminBalance(dir){const n=+q('creditAmount').value;if(n<=0)return;s.balance=dir>0?s.balance+n:Math.max(0,s.balance-n);s.audit.push({time:new Date().toLocaleString(),text:'Admin '+(dir>0?'credit ':'debit ')+money(n)});save();render();notify('Balance updated')}
+async function api(path,options={}){const r=await fetch(path,{credentials:'include',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||'Request failed');return d}
+async function pollSimulation(){for(const pair of PAIRS){const symbol=REV[pair];try{const d=await api('/api/simulation?symbol='+symbol);if(d.simulationPrice!=null){s.simulation[pair]=Number(d.simulationPrice);s.prices[pair]=Number(d.simulationPrice);makeSimCandle(pair,Number(d.simulationPrice))}}catch{}}save();checkStops();render()}
+function moveSim(dir){adminMove(dir)}
+async function adminMove(dir){const pair=q('adminPair').value||s.selected,amount=Number(q('adminMove').value);try{const d=await api('/api/simulation?symbol='+REV[pair],{method:'POST',body:JSON.stringify({amount,direction:dir>0?'up':'down'})});s.simulation[pair]=d.simulationPrice;s.prices[pair]=d.simulationPrice;makeSimCandle(pair,d.simulationPrice);save();checkStops();render();notify(pair+' moved '+(dir>0?'+':'-')+money(amount))}catch(e){notify(e.message)}}
+async function resetSim(){const pair=q('simPair').value||s.selected;try{await api('/api/simulation?symbol='+REV[pair],{method:'DELETE'});delete s.simulation[pair];await loadHistorical(pair);notify('Returned to live price')}catch(e){notify(e.message)}render()}
+async function unlockAdmin(){const email=q('adminEmail').value.trim().toLowerCase(),password=q('adminPassword').value;if(email!==ADMIN_EMAIL)return notify('Only the designated admin email is permitted');try{const d=await api('/api/admin/login',{method:'POST',body:JSON.stringify({email,password})});if(!d.ok)return notify('Admin authentication failed');s.admin=true;s.user={name:'DevolksCapital Admin',email:ADMIN_EMAIL};save();render();notify('Admin access granted');await loadAdminState()}catch(e){notify('Admin authentication failed')}}
+async function loadAdminState(){try{const d=await api('/api/admin/state');q('serverStatus').textContent=d.storage?'CONNECTED':'UNAVAILABLE';q('adminUsers').textContent=d.users??'—';q('adminUser').innerHTML='<option value="">Select user</option>'+(d.userList||[]).map(u=>`<option value="${u.id}">${u.name} · ${u.email} · ${money(u.balance)}</option>`).join('');q('adminTrades').textContent=d.trades??'—';q('audit').innerHTML=(d.audit||[]).map(a=>'<div class="row"><span>'+new Date(a.time).toLocaleString()+'</span><b>'+String(a.text||'')+'</b></div>').join('')||'No activity'}catch{q('serverStatus').textContent='UNAVAILABLE'}}
+async function adminBalance(dir){const n=+q('creditAmount').value;if(n<=0)return;try{const d=await api('/api/admin/credit',{method:'POST',body:JSON.stringify({amount:n,direction:dir>0?'credit':'debit',userId:q('adminUser').value})});s.balance=d.balance;save();render();await loadAdminState();notify('Balance updated')}catch(e){notify(e.message)}}
 function addFunds(){s.balance+=1000;save();render();notify('$1,000 demo funds added')}
-function logout(){s.user=null;s.admin=false;save();location.reload()}
-
-let signup=true;
+async function logout(){try{await api('/api/admin/logout',{method:'POST'})}catch{}s.user=null;s.admin=false;save();location.reload()}
+  let signup=true;
 q('authForm').onsubmit=e=>{
   e.preventDefault();const em=q('email').value.trim().toLowerCase(),pw=q('pw').value;
   if(pw.length<6)return notify('Password must be at least 6 characters');
@@ -451,6 +424,9 @@ if(s.user)showApp();
 render();
 connectMarket();
 loadAllHistorical();
+Object.keys(CHARTS).forEach(initChartTools);
+setInterval(pollSimulation,1500);
+(async()=>{try{const d=await api('/api/admin/me');if(d.admin){s.admin=true;s.user={name:'DevolksCapital Admin',email:ADMIN_EMAIL};save();render();loadAdminState()}}catch{}})();
 </script>
 </body>
 </html>
