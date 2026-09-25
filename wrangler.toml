@@ -5,3 +5,8 @@ compatibility_date = "2026-08-23"
 [assets]
 directory = "./public"
 binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "devolkscapital"
+database_id = "5064beed-ff9c-4244-94fb-72d4d381d6ec"
